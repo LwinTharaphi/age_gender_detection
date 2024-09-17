@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age and Gender Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload your photo to predict age and gender</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="file-input" name="file" accept="image/*">
+            <button type="submit">Predict</button>
+        </form>
+        <button id="camera-btn">
+            <i class="fas fa-camera"></i> Open the Camera
+        </button>
+        <div id="result">
+            <img id="uploaded-image" src="" alt="Uploaded Image" style="display: none;">
+            <div id="prediction-output"></div>
+            <video id="webcam" autoplay playsinline style="display: none;transform: scaleX(-1);"></video>
+        </div>
+        <button id="predict-webcam-btn" style="display: none;">Predict with Webcam</button>
+        <button id="stop-webcam-btn" style="display: none;">Stop Camera</button>
+
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
