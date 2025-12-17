@@ -1,107 +1,133 @@
-Age and Gender Detection Using Deep Learning
+# Age and Gender Detection Using Deep Learning
 
-This project is a web-based age and gender detection system that uses deep learning to predict a person's age and gender from images or real-time webcam input. The system is built with a Convolutional Neural Network (CNN) and deployed as an interactive web application.
+This project is a **web-based age and gender detection system** that uses deep learning to predict a person's age and gender from images or real-time webcam input. The system is built with a Convolutional Neural Network (CNN) and deployed as an interactive web application.
 
-🎯 Project Motivation
+---
+
+## 🎯 Project Motivation
 
 Age and gender detection has practical applications in areas such as:
 
-Security and surveillance
-
-Retail and customer analytics
-
-Advertising and audience analysis
-
-Human–computer interaction
+* Security and surveillance
+* Retail and customer analytics
+* Advertising and audience analysis
+* Human–computer interaction
 
 This project demonstrates how deep learning can be applied to real-world computer vision problems.
 
-🧠 Model Overview
+---
 
-Dataset: UTKFace Dataset
+## 🧠 Model Overview
 
-Model Type: Convolutional Neural Network (CNN)
+* **Dataset:** UTKFace Dataset
+* **Model Type:** Convolutional Neural Network (CNN)
+* **Framework:** TensorFlow / Keras
+* **Architecture:** Multi-output model
 
-Framework: TensorFlow / Keras
+  * Gender prediction (classification)
+  * Age prediction (regression)
 
-Architecture: Multi-output model
+### Outputs
 
-Gender prediction (classification)
+* **Gender:** Sigmoid activation (Male / Female)
+* **Age:** ReLU activation (predicted age value)
 
-Age prediction (regression)
+---
 
-Outputs
+## 📊 Model Performance
 
-Gender: Sigmoid activation (Male / Female)
+* **Gender Accuracy:** 83.54%
+* **Age Prediction Error (MAE):** 6.7 years
 
-Age: ReLU activation (predicted age value)
+---
 
-📊 Model Performance
+## 🖼️ Image Preprocessing & Prediction Workflow
 
-Gender Accuracy: 83.54%
+1. Convert input images to grayscale
+2. Detect and crop faces using OpenCV
+3. Resize and normalize images
+4. Feed preprocessed faces into the CNN model
+5. Predict age and gender for each detected face
 
-Age Prediction Error (MAE): 6.7 years
+The system supports **multiple face detection** within a single image.
 
-🖼️ Image Preprocessing & Prediction Workflow
+---
 
-Convert input images to grayscale
+## 🌐 Web Application Features
 
-Detect and crop faces using OpenCV
+* Upload images for age and gender prediction
+* Real-time webcam integration
+* Display predicted age and gender results
+* Handle multiple faces in one image
 
-Resize and normalize images
+---
 
-Feed preprocessed faces into the CNN model
+## 🛠️ Tech Stack
 
-Predict age and gender for each detected face
+**Machine Learning**
 
-The system supports multiple face detection within a single image.
+* TensorFlow
+* Keras
+* OpenCV
 
-🌐 Web Application Features
+**Backend**
 
-Upload images for age and gender prediction
+* Flask
 
-Real-time webcam integration
+**Frontend**
 
-Display predicted age and gender results
+* HTML
+* CSS
+* JavaScript
 
-Handle multiple faces in one image
+---
 
-🛠️ Tech Stack
+## ⚙️ Challenges & Solutions
 
-Machine Learning
+**Challenge:** Handling multiple faces in a single image
+**Solution:** Implemented OpenCV-based face detection to detect and predict each face individually
 
-TensorFlow
+**Challenge:** Improving prediction accuracy
+**Solution:** Applied image preprocessing techniques such as grayscale conversion and face cropping
 
-Keras
+---
 
-OpenCV
+## 🚀 How It Works (Webcam Mode)
 
-Backend
+1. Capture image from webcam
+2. Detect faces in real time
+3. Run predictions on detected faces
+4. Display results instantly
 
-Flask
+---
 
-Frontend
+## 📁 Dataset
 
-HTML
+* UTKFace Dataset
+* Contains labeled images with age and gender information
 
-CSS
+---
 
-JavaScript
+## 🔗 Source Code
 
-⚙️ Challenges & Solutions
+GitHub Repository:
+[https://github.com/LwinTharaphi/age_gender_detection](https://github.com/LwinTharaphi/age_gender_detection)
 
-Challenge: Handling multiple faces in a single image
-Solution: Implemented OpenCV-based face detection to detect and predict each face individually
+---
 
-Challenge: Improving prediction accuracy
-Solution: Applied image preprocessing techniques such as grayscale conversion and face cropping
+## 👤 Author
 
-🚀 How It Works (Webcam Mode)
+**Tharaphi Lwin**
+Deep Learning / Data Science Student
+Assumption University of Thailand
 
-Capture image from webcam
+---
 
-Detect faces in real time
+## 📚 References
 
-Run predictions on detected faces
+* Analytics Vidhya – Age and Gender Detection Using Deep Learning
+* Kaggle – Age and Gender Prediction CNN
 
-Display results instantly
+---
+
+Thank you for checking out this project!
