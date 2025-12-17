@@ -4,7 +4,7 @@ This project is a **web-based age and gender detection system** that uses deep l
 
 ---
 
-## 🎯 Project Motivation
+## Project Motivation
 
 Age and gender detection has practical applications in areas such as:
 
@@ -17,7 +17,7 @@ This project demonstrates how deep learning can be applied to real-world compute
 
 ---
 
-## 🧠 Model Overview
+## Model Overview
 
 * **Dataset:** UTKFace Dataset
 * **Model Type:** Convolutional Neural Network (CNN)
@@ -34,14 +34,14 @@ This project demonstrates how deep learning can be applied to real-world compute
 
 ---
 
-## 📊 Model Performance
+## Model Performance
 
 * **Gender Accuracy:** 83.54%
 * **Age Prediction Error (MAE):** 6.7 years
 
 ---
 
-## 🖼️ Image Preprocessing & Prediction Workflow
+## Image Preprocessing & Prediction Workflow
 
 1. Convert input images to grayscale
 2. Detect and crop faces using OpenCV
@@ -53,7 +53,7 @@ The system supports **multiple face detection** within a single image.
 
 ---
 
-## 🌐 Web Application Features
+## Web Application Features
 
 * Upload images for age and gender prediction
 * Real-time webcam integration
@@ -62,7 +62,7 @@ The system supports **multiple face detection** within a single image.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Machine Learning**
 
@@ -82,7 +82,7 @@ The system supports **multiple face detection** within a single image.
 
 ---
 
-## ⚙️ Challenges & Solutions
+## Challenges & Solutions
 
 **Challenge:** Handling multiple faces in a single image
 **Solution:** Implemented OpenCV-based face detection to detect and predict each face individually
@@ -92,7 +92,7 @@ The system supports **multiple face detection** within a single image.
 
 ---
 
-## 🚀 How It Works (Webcam Mode)
+## How It Works (Webcam Mode)
 
 1. Capture image from webcam
 2. Detect faces in real time
@@ -101,14 +101,14 @@ The system supports **multiple face detection** within a single image.
 
 ---
 
-## 📁 Dataset
+## Dataset
 
 * UTKFace Dataset
 * Contains labeled images with age and gender information
 
 ---
 
-## 🔗 Source Code
+## Source Code
 
 GitHub Repository:
 [https://github.com/LwinTharaphi/age_gender_detection](https://github.com/LwinTharaphi/age_gender_detection)
@@ -118,12 +118,12 @@ GitHub Repository:
 ## 👤 Author
 
 **Tharaphi Lwin**
-Deep Learning / Data Science Student
+Deep Learning / Computer Science Student
 Assumption University of Thailand
 
 ---
 
-## 📚 References
+## References
 
 * Analytics Vidhya – Age and Gender Detection Using Deep Learning
 * Kaggle – Age and Gender Prediction CNN
