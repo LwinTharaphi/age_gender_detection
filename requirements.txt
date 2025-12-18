@@ -1,6 +1,6 @@
-flask
+flask==3.0.3
 gunicorn
-tensorflow==2.13.0
+tensorflow==2.16.2
 numpy
 pillow
 mtcnn
