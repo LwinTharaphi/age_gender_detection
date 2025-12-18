@@ -1,145 +1,132 @@
-# =========================
-# PERFORMANCE & STABILITY
-# =========================
-import os
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["TF_NUM_INTRAOP_THREADS"] = "1"
-os.environ["TF_NUM_INTEROP_THREADS"] = "1"
-
-# =========================
-# IMPORTS
-# =========================
 from flask import Flask, render_template, request, jsonify
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.losses import MeanAbsoluteError
-from PIL import Image, ImageDraw
+from mtcnn import MTCNN
 import numpy as np
-import cv2
+from PIL import Image, ImageDraw
 import io
-import base64
+from tensorflow.keras.losses import MeanAbsoluteError
+import cv2
 
-# =========================
-# APP
-# =========================
 app = Flask(__name__)
 
-# =========================
-# LOAD MODELS (NO COMPILE)
-# =========================
-model_age = load_model(
-    "age-gender.h5",
-    custom_objects={"mae": MeanAbsoluteError()},
-    compile=False
-)
+# Load both pre-trained models with custom objects
+model_age = load_model('age-gender.h5', custom_objects={'mae': MeanAbsoluteError()})
+model_gender = load_model('improved_age_gender_model_with_augmentation.h5', custom_objects={'mae': MeanAbsoluteError()})
 
-model_gender = load_model(
-    "improved_age_gender_model_with_augmentation.h5",
-    custom_objects={"mae": MeanAbsoluteError()},
-    compile=False
-)
+# Initialize the face detector
+detector = MTCNN()
 
-# =========================
-# LIGHTWEIGHT FACE DETECTOR
-# =========================
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+def predict_age_gender(image):
+    # Convert image to grayscale
+    img = image.convert('L')
+    img = img.resize((128, 128))  # Resize to match the model's expected input size
+    img = img_to_array(img)
+    
+    # Add a channel dimension
+    img = np.expand_dims(img, axis=-1)
+    
+    # Add a batch dimension
+    img = np.expand_dims(img, axis=0)
+    
+    img = img.astype('float32') / 255.0
 
-# =========================
-# HELPERS
-# =========================
+    # Predict age using the age-focused model
+    age_predictions = model_age.predict(img.reshape(1, 128, 128, 1))
+    age_pred = age_predictions[1][0]  # Use the second output of the age model
+
+    # Predict gender using the gender-focused model
+    gender_predictions = model_gender.predict(img.reshape(1, 128, 128, 1))
+    gender_pred = gender_predictions[0][0]  # Use the first output of the gender model
+
+    # Decode the gender prediction
+    gender = "Female" if gender_pred > 0.5 else "Male"
+    
+    # Ensure age_pred is a scalar
+    age = round(float(age_pred[0]))  # Convert to float and then round
+
+    return gender, age
+
 def detect_faces(image):
-    gray = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
-
-    faces_cv = face_cascade.detectMultiScale(
-        gray,
-        scaleFactor=1.2,
-        minNeighbors=5,
-        minSize=(60, 60)
-    )
-
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
+    img_np = np.array(image)
+    results = detector.detect_faces(img_np)
     faces = []
-    for (x, y, w, h) in faces_cv:
-        face = image.crop((x, y, x + w, y + h))
-        faces.append((face, (x, y, x + w, y + h)))
+    base_margin = 10
+
+    for result in results:
+        x, y, width, height = result['box']
+        x2, y2 = x + width, y + height
+
+        # Calculate margin relative to face size
+        margin = int(max(width, height) * 0.1)  # 10% of face size
+
+        x = max(0, x - margin)
+        y = max(0, y - margin)
+        x2 = min(img_np.shape[1], x2 + margin)
+        y2 = min(img_np.shape[0], y2 + margin)
+
+        face = image.crop((x, y, x2, y2))
+        faces.append((face, (x, y, x2, y2)))
 
     return faces
 
 
-def predict_age_gender(face_img):
-    img = face_img.convert("L").resize((128, 128))
-    img = img_to_array(img).astype("float32") / 255.0
-    img = img.reshape(1, 128, 128, 1)
-
-    age_pred = model_age.predict(img, verbose=0)[1][0][0]
-    gender_pred = model_gender.predict(img, verbose=0)[0][0]
-
-    gender = "Female" if gender_pred > 0.5 else "Male"
-    age = round(float(age_pred))
-
-    return gender, age
-
-# =========================
-# ROUTES
-# =========================
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
+import base64
 
-@app.route("/predict", methods=["POST"])
+@app.route('/predict', methods=['POST'])
 def predict():
-    if "file" not in request.files:
-        return jsonify({"error": "No file uploaded"})
-
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No file selected"})
-
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'})
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'})
+    
     try:
-        img = Image.open(io.BytesIO(file.read())).convert("RGB")
+        file.seek(0)
+        img = Image.open(io.BytesIO(file.read()))
 
-        # LIMIT IMAGE SIZE (CRITICAL)
-        MAX_SIZE = 800
-        if max(img.size) > MAX_SIZE:
-            img.thumbnail((MAX_SIZE, MAX_SIZE))
-
+        # Detect faces
         faces = detect_faces(img)
+        predictions = []
+         
+
         if not faces:
-            return jsonify({"error": "No faces detected"})
+            return jsonify({'error': 'No faces detected'})
 
         draw = ImageDraw.Draw(img)
-        predictions = []
 
-        for face, (x1, y1, x2, y2) in faces:
+        for face, (x, y, x2, y2) in faces:
+            # Perform prediction
             gender, age = predict_age_gender(face)
+            print(f"Predicted Gender: {gender}, Age: {age}")  # Debug: Print prediction results
+            predictions.append({'gender': gender, 'age': age, 'box': [x, y, x2, y2]})
 
-            predictions.append({
-                "gender": gender,
-                "age": age,
-                "box": [x1, y1, x2, y2]
-            })
+            # Draw rectangle around the face and text
+            draw.rectangle([(x, y), (x2, y2)], outline="red", width=2)
+            draw.text((x, y - 10), f"{gender}, {age}", fill="red")
 
-            draw.rectangle([(x1, y1), (x2, y2)], outline="red", width=2)
-            draw.text((x1, y1 - 10), f"{gender}, {age}", fill="red")
-
+        # Save the modified image in memory
         output = io.BytesIO()
-        img.save(output, format="PNG")
-        encoded_image = base64.b64encode(output.getvalue()).decode("utf-8")
+        img.save(output, format='PNG')
+        output.seek(0)
+        encoded_image = base64.b64encode(output.getvalue()).decode('utf-8')
 
-        return jsonify({
-            "predictions": predictions,
-            "image": encoded_image
-        })
+        # Return the image and predictions in response
+        return jsonify({'predictions': predictions, 'image': encoded_image})
 
     except Exception as e:
-        return jsonify({"error": str(e)})
+        # More descriptive error message
+        print(f"Error: {str(e)}")  # Debug: Print error message
+        return jsonify({'error': f'Failed to process image: {str(e)}'})
 
-# =========================
-# MAIN
-# =========================
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     app.run(debug=False)
